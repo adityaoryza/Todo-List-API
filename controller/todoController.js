@@ -2,7 +2,7 @@ const db = require("../db/database");
 
 // note get ALl
 exports.getAll = (req, res) => {
-  let q = "select * from data;";
+  let q = "select * from activities;";
   db.query(q, (error, result) => {
     if (error) {
       console.error(error);
@@ -33,7 +33,7 @@ exports.getAll = (req, res) => {
 
 // note get One
 exports.getOne = (req, res) => {
-  let q = `select * from data where id=${req.params.id}`;
+  let q = `select * from activities where id=${req.params.id}`;
   db.query(q, (error, result) => {
     if (error) {
       console.error(error);
@@ -63,7 +63,7 @@ exports.getOne = (req, res) => {
 };
 // create new instance
 exports.createNew = (req, res) => {
-  let q = `INSERT INTO data SET ? `;
+  let q = `INSERT INTO activities SET ? `;
   const { title, email } = req.body;
   db.query(q, { title, email }, (error, result) => {
     if (error) throw error;
@@ -73,7 +73,7 @@ exports.createNew = (req, res) => {
 //Update instance
 exports.update = (req, res) => {
   const { title, email } = req.body;
-  let q = `UPDATE data SET ? where id=${req.params.id};`;
+  let q = `UPDATE activities SET ? where id=${req.params.id};`;
   db.query(q, { title, email }, (error, result) => {
     if (error) throw error;
     return res.status(201).json("Update data successfully");
@@ -81,7 +81,7 @@ exports.update = (req, res) => {
 };
 //Delete instance
 exports.deleteData = (req, res) => {
-  let q = `DELETE FROM data where id=${req.params.id};`;
+  let q = `DELETE FROM activities where id=${req.params.id};`;
   db.query(q, (error, result) => {
     if (error) throw error;
     return res.status(201).json("Delete data successfully");
