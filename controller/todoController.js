@@ -180,42 +180,78 @@ exports.deleteData = (req, res) => {
 // get all todos item
 exports.getAllTodoItems = (req, res) => {
   const { activity_group_id } = req.query;
-  let q = `SELECT * FROM todos WHERE activity_group_id = ?;`;
-  db.query(q, [activity_group_id], (error, result) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({
-        status: "Error",
-        message: "Unable to fetch data from database",
+  let q = `SELECT * FROM todos`;
+
+  // If activity_group_id query param is present and not empty
+  if (activity_group_id && activity_group_id.trim()) {
+    q += ` WHERE activity_group_id = ?`;
+    db.query(q, [activity_group_id], (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({
+          status: "Error",
+          message: "Unable to fetch data from database",
+        });
+      }
+
+      if (!result.length) {
+        return res.status(404).json({
+          status: "Error",
+          message: "Requested data not found",
+        });
+      }
+
+      const data = result.map((item) => ({
+        id: item.todo_id,
+        activity_group_id: item.activity_group_id,
+        title: item.title,
+        is_active: Boolean(item.is_active),
+        priority: item.priority,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      }));
+
+      return res.status(200).json({
+        status: "Success",
+        message: "Success",
+        data,
       });
-    }
+    });
+  } else {
+    // If activity_group_id query param is missing or empty
+    db.query(q, (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({
+          status: "Error",
+          message: "Unable to fetch data from database",
+        });
+      }
 
-    if (!result.length) {
-      return res.status(404).json({
-        status: "Error",
-        message: "Requested data not found",
+      if (!result.length) {
+        return res.status(404).json({
+          status: "Error",
+          message: "Requested data not found",
+        });
+      }
+
+      const data = result.map((item) => ({
+        id: item.todo_id,
+        activity_group_id: item.activity_group_id,
+        title: item.title,
+        is_active: Boolean(item.is_active),
+        priority: item.priority,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      }));
+
+      return res.status(200).json({
+        status: "Success",
+        message: "Success",
+        data,
       });
-    }
-
-    const data = result[0];
-    result[0] = {
-      status: "Success",
-      message: "Success",
-      data: [
-        {
-          id: data.todo_id,
-          activityGroupId: data.activity_group_id,
-          title: data.title,
-          priority: data.priority,
-          isActive: Boolean(data.is_active),
-          createdAt: data.created_at,
-          updatedAt: data.updated_at,
-        },
-      ],
-    };
-
-    return res.status(201).json(result);
-  });
+    });
+  }
 };
 
 // note get One todo Items
@@ -232,8 +268,8 @@ exports.getOneTodoItem = (req, res) => {
 
     if (result.length === 0) {
       return res.status(404).json({
-        status: "Error",
-        message: "Todo item not found",
+        status: "Not Found",
+        message: `Todo with ID ${req.params.todo_id} Not Found`,
       });
     }
 
@@ -244,12 +280,12 @@ exports.getOneTodoItem = (req, res) => {
       message: "Success",
       data: {
         id: data.todo_id,
-        activityGroupId: data.activity_group_id,
+        activity_group_id: data.activity_group_id,
         title: data.title,
         priority: data.priority,
-        isActive: Boolean(data.is_active),
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        is_active: Boolean(data.is_active),
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
       },
     });
   });
@@ -261,10 +297,16 @@ exports.createNewTodoItems = (req, res) => {
   const priority = req.body.priority || "very High"; // default priority is medium
 
   // check if required fields are present
-  if (!title || !activity_group_id || is_active == undefined) {
+  if (!title) {
     return res.status(400).json({
-      status: "Error",
-      message: "Missing required fields",
+      status: "Bad Request",
+      message: "title cannot be null",
+    });
+  }
+  if (activity_group_id == undefined) {
+    return res.status(400).json({
+      status: "Bad Request",
+      message: "activity_group_id cannot be null",
     });
   }
 
@@ -284,15 +326,15 @@ exports.createNewTodoItems = (req, res) => {
 
       return res.status(201).json({
         status: "Success",
-        message: "Todo item created successfully",
+        message: "Success",
         data: {
           id: result.insertId,
           title,
           activity_group_id,
           is_active,
           priority,
-          created_at: new Date(),
-          updated_at: new Date(),
+          updatedAt: new Date(),
+          createdAt: new Date(),
         },
       });
     }
@@ -303,7 +345,7 @@ exports.createNewTodoItems = (req, res) => {
 exports.updateTodoItem = (req, res) => {
   const { activity_group_id, title, is_active, priority } = req.body;
   let sets = [];
-  if (activity_group_id)
+  if (activity_group_id !== undefined)
     sets.push(`activity_group_id = ${db.escape(activity_group_id)}`);
   if (title) sets.push(`title = ${db.escape(title)}`);
   if (is_active !== undefined) sets.push(`is_active = ${is_active}`);
@@ -311,8 +353,34 @@ exports.updateTodoItem = (req, res) => {
   let setClause = sets.join(", ");
   let q = `UPDATE todos SET ${setClause} WHERE todo_id=${req.params.todo_id};`;
   db.query(q, (error, result) => {
-    if (error) throw error;
-    return res.status(201).json("Update data successfully");
+    if (error) {
+      console.error(error);
+      return res.status(500).json({
+        status: "Error",
+        message: "Unable to update todo item",
+      });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "Not Found",
+        message: `Todo with ID ${req.params.todo_id} Not Found`,
+      });
+    }
+
+    return res.status(200).json({
+      status: "Success",
+      message: "Success",
+      data: {
+        id: req.params.todo_id,
+        activity_group_id,
+        title,
+        is_active,
+        priority,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
   });
 };
 
