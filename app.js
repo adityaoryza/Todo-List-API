@@ -22,7 +22,7 @@ app.use(cors());
 app.use("/api", todos);
 
 // define port
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3030;
 app.listen(port, () => {
   console.log(`listening on ${port}`);
 });
