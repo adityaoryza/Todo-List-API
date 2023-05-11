@@ -6,11 +6,11 @@ const {
   createNew,
   update,
   deleteData,
-  getTodoAll,
-  getTodoOne,
-  createTodoNew,
-  updateTodo,
-  deleteTodoData,
+  getAllTodoItems,
+  getOneTodoItem,
+  createNewTodoItems,
+  updateTodoItem,
+  deleteTodoItem,
 } = require("../controller/todoController");
 
 // note activity-groups
@@ -29,14 +29,14 @@ router.delete("/activity-groups/:activity_id", deleteData);
 //note todo group
 
 // get All
-router.get("/activity-groups", getTodoAll);
-// get One
-router.get("/activity-groups/:activity_id", getTodoOne);
-// create New
-router.post("/activity-groups", createTodoNew);
-// update
-router.patch("/activity-groups/:activity_id", updateTodo);
-// delete
-router.delete("/activity-groups/:activity_id", deleteTodoData);
+router.get("/todos-items", getAllTodoItems);
+// // get One
+router.get("/todos-items/:todo_id", getOneTodoItem);
+// // create New
+router.post("/todos-items", createNewTodoItems);
+// // update
+router.patch("/todos-items/:todo_id", updateTodoItem);
+// // delete
+router.delete("/todos-items/:todo_id", deleteTodoItem);
 
 module.exports = router;
