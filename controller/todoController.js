@@ -23,8 +23,8 @@ exports.getAll = (req, res) => {
           id: data.activity_id,
           title: data.title,
           email: data.email,
-          createdAt: data.createdAt,
-          updatedAt: data.updatedAt,
+          createdAt: data.created_at,
+          updatedAt: data.updated_at,
         },
       ],
     };
@@ -61,8 +61,8 @@ exports.getOne = (req, res) => {
           id: data.activity_id,
           title: data.title,
           email: data.email,
-          createdAt: data.createdAt,
-          updatedAt: data.updatedAt,
+          createdAt: data.created_at,
+          updatedAt: data.updated_at,
         },
       ],
     };
@@ -140,8 +140,8 @@ exports.update = (req, res) => {
           id: data.activity_id,
           title: data.title,
           email: data.email,
-          createdAt: data.createdAt,
-          updatedAt: data.updatedAt,
+          createdAt: data.created_at,
+          updatedAt: data.updated_at,
         },
       };
 
@@ -207,8 +207,8 @@ exports.getAllTodoItems = (req, res) => {
         title: item.title,
         is_active: Boolean(item.is_active),
         priority: item.priority,
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt,
+        createdAt: item.created_at,
+        updatedAt: item.updated_at,
       }));
 
       return res.status(200).json({
@@ -241,8 +241,8 @@ exports.getAllTodoItems = (req, res) => {
         title: item.title,
         is_active: Boolean(item.is_active),
         priority: item.priority,
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt,
+        createdAt: item.created_at,
+        updatedAt: item.updated_at,
       }));
 
       return res.status(200).json({
@@ -284,8 +284,8 @@ exports.getOneTodoItem = (req, res) => {
         title: data.title,
         priority: data.priority,
         is_active: Boolean(data.is_active),
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
       },
     });
   });
@@ -377,7 +377,7 @@ exports.updateTodoItem = (req, res) => {
         title,
         is_active,
         priority,
-        createdAt: new Date(),
+        createdAt: created_at,
         updatedAt: new Date(),
       },
     });
