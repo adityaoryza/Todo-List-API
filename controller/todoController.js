@@ -383,18 +383,30 @@ exports.updateTodoItem = (req, res) => {
       });
     }
 
-    return res.status(200).json({
-      status: "Success",
-      message: "Success",
-      data: {
-        id: req.params.todo_id,
-        activity_group_id,
-        title,
-        is_active,
-        priority,
-        updatedAt: new Date(),
-        updatedAt: new Date(),
-      },
+    let getUpdatedTodoQuery = `SELECT * FROM todos WHERE todo_id=${req.params.todo_id}`;
+    db.query(getUpdatedTodoQuery, (error, result) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).json({
+          status: "Error",
+          message: "Unable to fetch updated data from database",
+        });
+      }
+
+      const data = result[0];
+      return res.status(200).json({
+        status: "Success",
+        message: "Success",
+        data: {
+          id: data.todo_id,
+          activity_group_id: data.activity_group_id,
+          title: data.title,
+          is_active: data.is_active,
+          priority: data.priority,
+          createdAt: data.created_at,
+          updatedAt: data.updated_at,
+        },
+      });
     });
   });
 };
