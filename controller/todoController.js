@@ -1,6 +1,6 @@
 const db = require("../db/database");
 
-// note activities group
+//============================================================ note activities group
 
 // note get all activities
 exports.getAll = (req, res) => {
@@ -29,13 +29,19 @@ exports.getAll = (req, res) => {
       ],
     };
 
-    return res.status(201).json(result);
+    return res.status(200).json({
+      status: "Success",
+      message: "Success",
+      data: result[0].data,
+    });
   });
 };
 
 // note get One activities
 exports.getOne = (req, res) => {
-  let q = `SELECT * FROM activities WHERE activity_id=${req.params.activity_id}`;
+  const activityId = req.params.activity_id;
+  const q = `SELECT * FROM activities WHERE activity_id=${activityId}`;
+
   db.query(q, (error, result) => {
     if (error) {
       console.error(error);
@@ -48,26 +54,22 @@ exports.getOne = (req, res) => {
     if (result.length === 0) {
       return res.status(404).json({
         status: "Not Found",
-        message: `Activity with ID ${req.params.activity_id} Not Found`,
+        message: `Activity with ID ${activityId} Not Found`,
       });
     }
 
     const data = result[0];
-    result[0] = {
+    return res.status(200).json({
       status: "Success",
       message: "Success",
-      data: [
-        {
-          id: data.activity_id,
-          title: data.title,
-          email: data.email,
-          createdAt: data.created_at,
-          updatedAt: data.updated_at,
-        },
-      ],
-    };
-
-    return res.status(200).json(result);
+      data: {
+        id: data.activity_id,
+        title: data.title,
+        email: data.email,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+      },
+    });
   });
 };
 
@@ -411,7 +413,7 @@ exports.updateTodoItem = (req, res) => {
   });
 };
 
-// delete todos item
+// note delete todos item
 exports.deleteTodoItem = (req, res) => {
   const todoId = req.params.todo_id;
 
