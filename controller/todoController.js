@@ -105,7 +105,6 @@ exports.createNew = (req, res) => {
 };
 
 //note  update activities
-
 exports.update = (req, res) => {
   const { title, email } = req.body;
   let q = `UPDATE activities SET `;
@@ -146,7 +145,7 @@ exports.update = (req, res) => {
       }
 
       const data = result[0];
-      result[0] = {
+      res.status(200).json({
         status: "Success",
         message: "Success",
         data: {
@@ -156,9 +155,7 @@ exports.update = (req, res) => {
           createdAt: data.created_at,
           updatedAt: data.updated_at,
         },
-      };
-
-      return res.status(200).json(result);
+      });
     });
   });
 };
