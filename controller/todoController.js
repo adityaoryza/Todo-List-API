@@ -2,7 +2,7 @@ const db = require("../db/database");
 
 //============================================================ note activities group
 
-// note get all activities
+// // note get all activities
 exports.getAll = (req, res) => {
   let q = "select * from activities;";
   db.query(q, (error, result) => {

@@ -6,6 +6,9 @@ const cors = require("cors");
 const cacheController = require("express-cache-controller");
 const compression = require("compression");
 require("dotenv").config();
+// note caching using express-api-cache
+var cacheService = require("express-api-cache");
+var cache = cacheService.cache;
 
 // import routes
 const todos = require("./routes/todoRoutes");
@@ -25,7 +28,19 @@ app.use(
     maxAge: 60 * 60 * 24, // set cache max age to 1 day
   })
 );
-app.use(compression());
+
+app.use(
+  compression({
+    level: 6,
+    threshold: 10 * 1000,
+    filter: (req, res) => {
+      if (req.headers["x-no-comprehension"]) {
+        return false;
+      }
+      return compression.filter(req, res);
+    },
+  })
+);
 
 // routes midleware
 app.use("", todos);
