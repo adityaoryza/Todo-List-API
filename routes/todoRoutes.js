@@ -8,7 +8,7 @@ const {
   deleteData,
   getAllTodoItems,
   getOneTodoItem,
-  createNewTodoItems,
+  createNewTodoItem,
   updateTodoItem,
   deleteTodoItem,
 } = require("../controller/todoController");
@@ -33,7 +33,7 @@ router.get("/todo-items", getAllTodoItems);
 // // get One
 router.get("/todo-items/:todo_id", getOneTodoItem);
 // // create New
-router.post("/todo-items", createNewTodoItems);
+router.post("/todo-items", createNewTodoItem);
 // // update
 router.patch("/todo-items/:todo_id", updateTodoItem);
 // // delete

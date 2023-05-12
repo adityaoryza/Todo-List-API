@@ -2,7 +2,7 @@ const db = require("../db/database");
 
 // note activities group
 
-// get all activities
+// note get all activities
 exports.getAll = (req, res) => {
   let q = "select * from activities;";
   db.query(q, (error, result) => {
@@ -71,7 +71,7 @@ exports.getOne = (req, res) => {
   });
 };
 
-// create new activities
+//note create new activities
 exports.createNew = (req, res) => {
   const { title, email } = req.body;
   if (!title) {
@@ -98,7 +98,7 @@ exports.createNew = (req, res) => {
   });
 };
 
-// update activities
+//note update activities
 exports.update = (req, res) => {
   const { title, email } = req.body;
   let q = `UPDATE activities SET `;
@@ -150,7 +150,7 @@ exports.update = (req, res) => {
   });
 };
 
-//Delete activities
+//note Delete activities
 exports.deleteData = (req, res) => {
   let q = `DELETE FROM activities where activity_id=${req.params.activity_id};`;
   db.query(q, (error, result) => {
@@ -177,7 +177,7 @@ exports.deleteData = (req, res) => {
 
 // note todos group
 
-// get all todos item
+//note get all todos item
 exports.getAllTodoItems = (req, res) => {
   const { activity_group_id } = req.query;
   let q = `SELECT * FROM todos`;
@@ -292,7 +292,7 @@ exports.getOneTodoItem = (req, res) => {
 };
 
 //note  create new Todo Item
-exports.createNewTodoItems = (req, res) => {
+exports.createNewTodoItem = (req, res) => {
   const { title, activity_group_id, is_active } = req.body;
   const priority = req.body.priority || "very High"; // default priority is medium
 
@@ -377,7 +377,7 @@ exports.updateTodoItem = (req, res) => {
         title,
         is_active,
         priority,
-        createdAt: created_at,
+        createdAt: new Date(),
         updatedAt: new Date(),
       },
     });
