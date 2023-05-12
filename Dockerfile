@@ -1,12 +1,13 @@
-# FROM node:18
+FROM node:alpine
 
-# WORKDIR /usr/
-# # install dependencies
-# COPY package*.json ./
-# RUN npm install 
+WORKDIR /app
 
-# # bundle app source 
-# COPY . .
+COPY package*.json ./
 
-# CMD ["npm", "start"]
+RUN npm install
 
+COPY . .
+
+EXPOSE 3030
+
+CMD ["npm", "start"]

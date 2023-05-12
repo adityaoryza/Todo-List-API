@@ -29,14 +29,14 @@ router.delete("/activity-groups/:activity_id", deleteData);
 //note todo group
 
 // get All
-router.get("/todos-items", getAllTodoItems);
+router.get("/todo-items", getAllTodoItems);
 // // get One
-router.get("/todos-items/:todo_id", getOneTodoItem);
+router.get("/todo-items/:todo_id", getOneTodoItem);
 // // create New
-router.post("/todos-items", createNewTodoItems);
+router.post("/todo-items", createNewTodoItems);
 // // update
-router.patch("/todos-items/:todo_id", updateTodoItem);
+router.patch("/todo-items/:todo_id", updateTodoItem);
 // // delete
-router.delete("/todos-items/:todo_id", deleteTodoItem);
+router.delete("/todo-items/:todo_id", deleteTodoItem);
 
 module.exports = router;
