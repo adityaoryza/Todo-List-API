@@ -377,7 +377,7 @@ exports.updateTodoItem = (req, res) => {
         title,
         is_active,
         priority,
-        createdAt: new Date(),
+        updatedAt: new Date(),
         updatedAt: new Date(),
       },
     });
