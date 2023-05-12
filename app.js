@@ -28,7 +28,7 @@ app.use(
 app.use(compression());
 
 // routes midleware
-app.use("/api", todos);
+app.use("", todos);
 
 // define port
 const port = process.env.PORT || 3030;

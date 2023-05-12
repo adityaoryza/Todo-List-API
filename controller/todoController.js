@@ -80,6 +80,12 @@ exports.createNew = (req, res) => {
       message: "title cannot be null",
     });
   }
+  if (!email) {
+    return res.status(400).json({
+      status: "Bad Request",
+      message: "email cannot be null",
+    });
+  }
   let q = `INSERT INTO activities SET ? `;
   db.query(q, { title, email }, (error, result) => {
     if (error) throw error;
@@ -98,7 +104,8 @@ exports.createNew = (req, res) => {
   });
 };
 
-//note update activities
+//note  update activities
+
 exports.update = (req, res) => {
   const { title, email } = req.body;
   let q = `UPDATE activities SET `;
@@ -112,6 +119,12 @@ exports.update = (req, res) => {
       return res.status(500).json({
         status: "Error",
         message: "Unable to update data in database",
+      });
+    }
+    if (title === "" || email === "") {
+      return res.status(400).json({
+        status: "Bad Request",
+        message: "Title and email cannot be blank",
       });
     }
 
@@ -175,7 +188,7 @@ exports.deleteData = (req, res) => {
   });
 };
 
-// note todos group
+// =====================================================note todos group
 
 //note get all todos item
 exports.getAllTodoItems = (req, res) => {
@@ -195,9 +208,11 @@ exports.getAllTodoItems = (req, res) => {
       }
 
       if (!result.length) {
-        return res.status(404).json({
-          status: "Error",
-          message: "Requested data not found",
+        const data = [];
+        return res.status(200).json({
+          status: "Success",
+          message: "No data found",
+          data,
         });
       }
 
@@ -294,7 +309,7 @@ exports.getOneTodoItem = (req, res) => {
 //note  create new Todo Item
 exports.createNewTodoItem = (req, res) => {
   const { title, activity_group_id, is_active } = req.body;
-  const priority = req.body.priority || "very High"; // default priority is medium
+  const priority = req.body.priority || "very-high"; // default priority is medium
 
   // check if required fields are present
   if (!title) {
@@ -310,11 +325,14 @@ exports.createNewTodoItem = (req, res) => {
     });
   }
 
+  // set default value for is_active if not specified in request
+  const isActive = is_active !== undefined ? is_active : true;
+
   // create SQL query to insert new todo item into database
   const q = `INSERT INTO todos (title, activity_group_id, is_active, priority) VALUES (?, ?, ?, ?)`;
   db.query(
     q,
-    [title, activity_group_id, is_active, priority],
+    [title, activity_group_id, isActive, priority],
     (error, result) => {
       if (error) {
         console.error(error);
@@ -331,7 +349,7 @@ exports.createNewTodoItem = (req, res) => {
           id: result.insertId,
           title,
           activity_group_id,
-          is_active,
+          is_active: isActive,
           priority,
           updatedAt: new Date(),
           createdAt: new Date(),
@@ -388,9 +406,17 @@ exports.updateTodoItem = (req, res) => {
 exports.deleteTodoItem = (req, res) => {
   const todoId = req.params.todo_id;
 
-  let q = `DELETE FROM todos WHERE todo_id = ${todoId}`;
-  db.query(q, (error, result) => {
-    if (error) throw error;
+  const q = "DELETE FROM todos WHERE todo_id = ?";
+  const params = [todoId];
+
+  db.query(q, params, (error, result) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({
+        status: "Error",
+        message: "Internal Server Error",
+      });
+    }
 
     if (result.affectedRows === 0) {
       return res.status(404).json({
