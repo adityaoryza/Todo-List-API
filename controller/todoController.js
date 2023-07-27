@@ -1,55 +1,38 @@
 const db = require('../models/db');
-
-//============================================================ note activities group
+const { queryAsync } = require('../models/dbUtils');
+const { errorHandler } = require('../middleware/errorMiddleware');
 
 // // note get all activities
-exports.getAll = (req, res) => {
-  let q = 'select * from activities;';
-  db.query(q, (error, result) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({
-        status: 'Error',
-        message: 'Unable to fetch data from database',
-      });
-    }
+exports.getAll = async (req, res, next) => {
+  try {
+    const q = 'SELECT activity_id, title, email, created_at FROM activities';
+    const result = await queryAsync(q);
 
-    const data = result[0];
-    result[0] = {
-      status: 'Success',
-      message: 'Success',
-      data: [
-        {
-          id: data.activity_id,
-          title: data.title,
-          email: data.email,
-          createdAt: data.created_at,
-          updatedAt: data.updated_at,
-        },
-      ],
-    };
+    const data = result.map((row) => ({
+      id: row.activity_id,
+      title: row.title,
+      email: row.email,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    }));
 
     return res.status(200).json({
       status: 'Success',
       message: 'Success',
-      data: result[0].data,
+      data,
     });
-  });
+  } catch (error) {
+    // Pass the error to the error handling middleware
+    next(error);
+  }
 };
 
 // note get One activities
-exports.getOne = (req, res) => {
-  const activityId = req.params.activity_id;
-  const q = `SELECT * FROM activities WHERE activity_id=${activityId}`;
-
-  db.query(q, (error, result) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({
-        status: 'Error',
-        message: 'Unable to fetch data from database',
-      });
-    }
+exports.getOne = async (req, res, next) => {
+  try {
+    const activityId = req.params.activity_id;
+    const q = `SELECT activity_id, title, email, created_at FROM activities WHERE activity_id = ?`;
+    const result = await queryAsync(q, [activityId]);
 
     if (result.length === 0) {
       return res.status(404).json({
@@ -70,58 +53,56 @@ exports.getOne = (req, res) => {
         updatedAt: data.updated_at,
       },
     });
-  });
+  } catch (error) {
+    // Pass the error to the error handling middleware
+    next(error);
+  }
 };
 
 //note create new activities
-exports.createNew = (req, res) => {
-  const { title, email } = req.body;
-  if (!title) {
-    return res.status(400).json({
-      status: 'Bad Request',
-      message: 'title cannot be null',
-    });
-  }
-  if (!email) {
-    return res.status(400).json({
-      status: 'Bad Request',
-      message: 'email cannot be null',
-    });
-  }
-  let q = `INSERT INTO activities SET ? `;
-  db.query(q, { title, email }, (error, result) => {
-    if (error) throw error;
+exports.createNew = async (req, res, next) => {
+  try {
+    const { title, email } = req.body;
+    if (!title) {
+      return res.status(400).json({
+        status: 'Bad Request',
+        message: 'title cannot be null',
+      });
+    }
+    if (!email) {
+      return res.status(400).json({
+        status: 'Bad Request',
+        message: 'email cannot be null',
+      });
+    }
+
+    const createdAt = new Date();
+    const q = `INSERT INTO activities (title, email, created_at) VALUES (?, ?, ?)`;
+    const result = await queryAsync(q, [title, email, createdAt]);
+
     const data = {
       id: result.insertId,
       title,
       email,
-      updatedAt: new Date(),
-      createdAt: new Date(),
+      updatedAt: createdAt,
+      createdAt,
     };
+
     return res.status(201).json({
       status: 'Success',
       message: 'Success',
       data,
     });
-  });
+  } catch (error) {
+    // Pass the error to the error handling middleware
+    next(error);
+  }
 };
 
 //note  update activities
-exports.update = (req, res) => {
-  const { title, email } = req.body;
-  let q = `UPDATE activities SET `;
-  let updates = [];
-  if (title) updates.push(`title = '${title}'`);
-  if (email) updates.push(`email = '${email}'`);
-  q += updates.join(', ') + ` WHERE activity_id = ${req.params.activity_id};`;
-  db.query(q, (error, result) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({
-        status: 'Error',
-        message: 'Unable to update data in database',
-      });
-    }
+exports.update = async (req, res, next) => {
+  try {
+    const { title, email } = req.body;
     if (title === '' || email === '') {
       return res.status(400).json({
         status: 'Bad Request',
@@ -129,6 +110,32 @@ exports.update = (req, res) => {
       });
     }
 
+    let updates = [];
+    let values = [];
+
+    if (title) {
+      updates.push('title = ?');
+      values.push(title);
+    }
+    if (email) {
+      updates.push('email = ?');
+      values.push(email);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({
+        status: 'Bad Request',
+        message: 'No valid fields to update',
+      });
+    }
+
+    values.push(req.params.activity_id);
+
+    const q = `UPDATE activities SET ${updates.join(
+      ', '
+    )} WHERE activity_id = ?`;
+    const result = await queryAsync(q, values);
+
     if (result.affectedRows === 0) {
       return res.status(404).json({
         status: 'Not Found',
@@ -136,82 +143,69 @@ exports.update = (req, res) => {
       });
     }
 
-    let getUpdatedDataQuery = `SELECT * FROM activities WHERE activity_id=${req.params.activity_id}`;
-    db.query(getUpdatedDataQuery, (error, result) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({
-          status: 'Error',
-          message: 'Unable to fetch updated data from database',
-        });
-      }
+    const getUpdatedDataQuery = `SELECT * FROM activities WHERE activity_id = ?`;
+    const updatedResult = await queryAsync(getUpdatedDataQuery, [
+      req.params.activity_id,
+    ]);
 
-      const data = result[0];
-      res.status(200).json({
-        status: 'Success',
-        message: 'Success',
-        data: {
-          id: data.activity_id,
-          title: data.title,
-          email: data.email,
-          createdAt: data.created_at,
-          updatedAt: data.updated_at,
-        },
-      });
+    const data = updatedResult[0];
+    res.status(200).json({
+      status: 'Success',
+      message: 'Success',
+      data: {
+        id: data.activity_id,
+        title: data.title,
+        email: data.email,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+      },
     });
-  });
+  } catch (error) {
+    // Pass the error to the error handling middleware
+    next(error);
+  }
 };
 
 //note Delete activities
-exports.deleteData = (req, res) => {
-  let q = `DELETE FROM activities where activity_id=${req.params.activity_id};`;
-  db.query(q, (error, result) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({
-        status: 'Internal Server Error',
-        message: 'Something went wrong',
-      });
-    }
+exports.deleteData = async (req, res, next) => {
+  try {
+    const q = `DELETE FROM activities WHERE activity_id = ?`;
+    const result = await queryAsync(q, [req.params.activity_id]);
+
     if (result.affectedRows === 0) {
       return res.status(404).json({
         status: 'Not Found',
         message: `Activity with ID ${req.params.activity_id} Not Found`,
       });
     }
+
     return res.status(200).json({
       status: 'Success',
       message: 'Success',
       data: {},
     });
-  });
+  } catch (error) {
+    // Pass the error to the error handling middleware
+    next(error);
+  }
 };
 
-// =====================================================note todos group
-
 //note get all todos item
-exports.getAllTodoItems = (req, res) => {
-  const { activity_group_id } = req.query;
-  let q = `SELECT * FROM todos`;
+exports.getAllTodoItems = async (req, res, next) => {
+  try {
+    const { activity_group_id } = req.query;
+    let q = `SELECT * FROM todos`;
 
-  // If activity_group_id query param is present and not empty
-  if (activity_group_id && activity_group_id.trim()) {
-    q += ` WHERE activity_group_id = ?`;
-    db.query(q, [activity_group_id], (error, result) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({
-          status: 'Error',
-          message: 'Unable to fetch data from database',
-        });
-      }
+    // If activity_group_id query param is present and not empty
+    if (activity_group_id && activity_group_id.trim()) {
+      q += ` WHERE activity_group_id = ?`;
+      const result = await queryAsync(q, [activity_group_id]);
 
       if (!result.length) {
-        const data = [];
         return res.status(200).json({
           status: 'Success',
           message: 'No data found',
-          data,
+          data: [],
         });
       }
 
@@ -230,17 +224,9 @@ exports.getAllTodoItems = (req, res) => {
         message: 'Success',
         data,
       });
-    });
-  } else {
-    // If activity_group_id query param is missing or empty
-    db.query(q, (error, result) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({
-          status: 'Error',
-          message: 'Unable to fetch data from database',
-        });
-      }
+    } else {
+      // If activity_group_id query param is missing or empty
+      const result = await queryAsync(q);
 
       if (!result.length) {
         return res.status(404).json({
@@ -264,21 +250,18 @@ exports.getAllTodoItems = (req, res) => {
         message: 'Success',
         data,
       });
-    });
+    }
+  } catch (error) {
+    // Pass the error to the error handling middleware
+    next(error);
   }
 };
 
 // note get One todo Items
-exports.getOneTodoItem = (req, res) => {
-  let q = `SELECT * FROM todos WHERE todo_id =${req.params.todo_id};`;
-  db.query(q, (error, result) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({
-        status: 'Error',
-        message: 'Unable to fetch data from database',
-      });
-    }
+exports.getOneTodoItem = async (req, res, next) => {
+  try {
+    const q = `SELECT todo_id, activity_group_id, title, priority, is_active, created_at FROM todos WHERE todo_id = ?`;
+    const result = await queryAsync(q, [req.params.todo_id]);
 
     if (result.length === 0) {
       return res.status(404).json({
@@ -302,7 +285,10 @@ exports.getOneTodoItem = (req, res) => {
         updatedAt: data.updated_at,
       },
     });
-  });
+  } catch (error) {
+    // Pass the error to the error handling middleware
+    next(error);
+  }
 };
 
 //note  create new Todo Item
@@ -385,7 +371,8 @@ exports.updateTodoItem = (req, res) => {
       });
     }
 
-    let getUpdatedTodoQuery = `SELECT * FROM todos WHERE todo_id=${req.params.todo_id}`;
+    // let getUpdatedTodoQuery = `SELECT * FROM todos WHERE todo_id=${req.params.todo_id}`;
+    let getUpdatedTodoQuery = `SELECT todo_id, activity_group_id, title, priority, is_active, created_at FROM todos WHERE todo_id = ${req.params.todo_id} `;
     db.query(getUpdatedTodoQuery, (error, result) => {
       if (error) {
         console.error(error);
