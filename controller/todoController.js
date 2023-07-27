@@ -1,23 +1,23 @@
-const db = require("../db/database");
+const db = require('../models/db');
 
 //============================================================ note activities group
 
 // // note get all activities
 exports.getAll = (req, res) => {
-  let q = "select * from activities;";
+  let q = 'select * from activities;';
   db.query(q, (error, result) => {
     if (error) {
       console.error(error);
       return res.status(500).json({
-        status: "Error",
-        message: "Unable to fetch data from database",
+        status: 'Error',
+        message: 'Unable to fetch data from database',
       });
     }
 
     const data = result[0];
     result[0] = {
-      status: "Success",
-      message: "Success",
+      status: 'Success',
+      message: 'Success',
       data: [
         {
           id: data.activity_id,
@@ -30,8 +30,8 @@ exports.getAll = (req, res) => {
     };
 
     return res.status(200).json({
-      status: "Success",
-      message: "Success",
+      status: 'Success',
+      message: 'Success',
       data: result[0].data,
     });
   });
@@ -46,22 +46,22 @@ exports.getOne = (req, res) => {
     if (error) {
       console.error(error);
       return res.status(500).json({
-        status: "Error",
-        message: "Unable to fetch data from database",
+        status: 'Error',
+        message: 'Unable to fetch data from database',
       });
     }
 
     if (result.length === 0) {
       return res.status(404).json({
-        status: "Not Found",
+        status: 'Not Found',
         message: `Activity with ID ${activityId} Not Found`,
       });
     }
 
     const data = result[0];
     return res.status(200).json({
-      status: "Success",
-      message: "Success",
+      status: 'Success',
+      message: 'Success',
       data: {
         id: data.activity_id,
         title: data.title,
@@ -78,14 +78,14 @@ exports.createNew = (req, res) => {
   const { title, email } = req.body;
   if (!title) {
     return res.status(400).json({
-      status: "Bad Request",
-      message: "title cannot be null",
+      status: 'Bad Request',
+      message: 'title cannot be null',
     });
   }
   if (!email) {
     return res.status(400).json({
-      status: "Bad Request",
-      message: "email cannot be null",
+      status: 'Bad Request',
+      message: 'email cannot be null',
     });
   }
   let q = `INSERT INTO activities SET ? `;
@@ -99,8 +99,8 @@ exports.createNew = (req, res) => {
       createdAt: new Date(),
     };
     return res.status(201).json({
-      status: "Success",
-      message: "Success",
+      status: 'Success',
+      message: 'Success',
       data,
     });
   });
@@ -113,25 +113,25 @@ exports.update = (req, res) => {
   let updates = [];
   if (title) updates.push(`title = '${title}'`);
   if (email) updates.push(`email = '${email}'`);
-  q += updates.join(", ") + ` WHERE activity_id = ${req.params.activity_id};`;
+  q += updates.join(', ') + ` WHERE activity_id = ${req.params.activity_id};`;
   db.query(q, (error, result) => {
     if (error) {
       console.error(error);
       return res.status(500).json({
-        status: "Error",
-        message: "Unable to update data in database",
+        status: 'Error',
+        message: 'Unable to update data in database',
       });
     }
-    if (title === "" || email === "") {
+    if (title === '' || email === '') {
       return res.status(400).json({
-        status: "Bad Request",
-        message: "Title and email cannot be blank",
+        status: 'Bad Request',
+        message: 'Title and email cannot be blank',
       });
     }
 
     if (result.affectedRows === 0) {
       return res.status(404).json({
-        status: "Not Found",
+        status: 'Not Found',
         message: `Activity with ID ${req.params.activity_id} Not Found`,
       });
     }
@@ -141,15 +141,15 @@ exports.update = (req, res) => {
       if (error) {
         console.error(error);
         return res.status(500).json({
-          status: "Error",
-          message: "Unable to fetch updated data from database",
+          status: 'Error',
+          message: 'Unable to fetch updated data from database',
         });
       }
 
       const data = result[0];
       res.status(200).json({
-        status: "Success",
-        message: "Success",
+        status: 'Success',
+        message: 'Success',
         data: {
           id: data.activity_id,
           title: data.title,
@@ -169,19 +169,19 @@ exports.deleteData = (req, res) => {
     if (error) {
       console.error(error);
       return res.status(500).json({
-        status: "Internal Server Error",
-        message: "Something went wrong",
+        status: 'Internal Server Error',
+        message: 'Something went wrong',
       });
     }
     if (result.affectedRows === 0) {
       return res.status(404).json({
-        status: "Not Found",
+        status: 'Not Found',
         message: `Activity with ID ${req.params.activity_id} Not Found`,
       });
     }
     return res.status(200).json({
-      status: "Success",
-      message: "Success",
+      status: 'Success',
+      message: 'Success',
       data: {},
     });
   });
@@ -201,16 +201,16 @@ exports.getAllTodoItems = (req, res) => {
       if (error) {
         console.error(error);
         return res.status(500).json({
-          status: "Error",
-          message: "Unable to fetch data from database",
+          status: 'Error',
+          message: 'Unable to fetch data from database',
         });
       }
 
       if (!result.length) {
         const data = [];
         return res.status(200).json({
-          status: "Success",
-          message: "No data found",
+          status: 'Success',
+          message: 'No data found',
           data,
         });
       }
@@ -226,8 +226,8 @@ exports.getAllTodoItems = (req, res) => {
       }));
 
       return res.status(200).json({
-        status: "Success",
-        message: "Success",
+        status: 'Success',
+        message: 'Success',
         data,
       });
     });
@@ -237,15 +237,15 @@ exports.getAllTodoItems = (req, res) => {
       if (error) {
         console.error(error);
         return res.status(500).json({
-          status: "Error",
-          message: "Unable to fetch data from database",
+          status: 'Error',
+          message: 'Unable to fetch data from database',
         });
       }
 
       if (!result.length) {
         return res.status(404).json({
-          status: "Error",
-          message: "Requested data not found",
+          status: 'Error',
+          message: 'Requested data not found',
         });
       }
 
@@ -260,8 +260,8 @@ exports.getAllTodoItems = (req, res) => {
       }));
 
       return res.status(200).json({
-        status: "Success",
-        message: "Success",
+        status: 'Success',
+        message: 'Success',
         data,
       });
     });
@@ -275,14 +275,14 @@ exports.getOneTodoItem = (req, res) => {
     if (error) {
       console.error(error);
       return res.status(500).json({
-        status: "Error",
-        message: "Unable to fetch data from database",
+        status: 'Error',
+        message: 'Unable to fetch data from database',
       });
     }
 
     if (result.length === 0) {
       return res.status(404).json({
-        status: "Not Found",
+        status: 'Not Found',
         message: `Todo with ID ${req.params.todo_id} Not Found`,
       });
     }
@@ -290,8 +290,8 @@ exports.getOneTodoItem = (req, res) => {
     const data = result[0];
 
     return res.status(200).json({
-      status: "Success",
-      message: "Success",
+      status: 'Success',
+      message: 'Success',
       data: {
         id: data.todo_id,
         activity_group_id: data.activity_group_id,
@@ -308,19 +308,19 @@ exports.getOneTodoItem = (req, res) => {
 //note  create new Todo Item
 exports.createNewTodoItem = (req, res) => {
   const { title, activity_group_id, is_active } = req.body;
-  const priority = req.body.priority || "very-high"; // default priority is medium
+  const priority = req.body.priority || 'very-high'; // default priority is medium
 
   // check if required fields are present
   if (!title) {
     return res.status(400).json({
-      status: "Bad Request",
-      message: "title cannot be null",
+      status: 'Bad Request',
+      message: 'title cannot be null',
     });
   }
   if (activity_group_id == undefined) {
     return res.status(400).json({
-      status: "Bad Request",
-      message: "activity_group_id cannot be null",
+      status: 'Bad Request',
+      message: 'activity_group_id cannot be null',
     });
   }
 
@@ -336,14 +336,14 @@ exports.createNewTodoItem = (req, res) => {
       if (error) {
         console.error(error);
         return res.status(500).json({
-          status: "Error",
-          message: "Unable to create new todo item",
+          status: 'Error',
+          message: 'Unable to create new todo item',
         });
       }
 
       return res.status(201).json({
-        status: "Success",
-        message: "Success",
+        status: 'Success',
+        message: 'Success',
         data: {
           id: result.insertId,
           title,
@@ -367,20 +367,20 @@ exports.updateTodoItem = (req, res) => {
   if (title) sets.push(`title = ${db.escape(title)}`);
   if (is_active !== undefined) sets.push(`is_active = ${is_active}`);
   if (priority) sets.push(`priority = ${db.escape(priority)}`);
-  let setClause = sets.join(", ");
+  let setClause = sets.join(', ');
   let q = `UPDATE todos SET ${setClause} WHERE todo_id=${req.params.todo_id};`;
   db.query(q, (error, result) => {
     if (error) {
       console.error(error);
       return res.status(500).json({
-        status: "Error",
-        message: "Unable to update todo item",
+        status: 'Error',
+        message: 'Unable to update todo item',
       });
     }
 
     if (result.affectedRows === 0) {
       return res.status(404).json({
-        status: "Not Found",
+        status: 'Not Found',
         message: `Todo with ID ${req.params.todo_id} Not Found`,
       });
     }
@@ -390,15 +390,15 @@ exports.updateTodoItem = (req, res) => {
       if (error) {
         console.error(error);
         return res.status(500).json({
-          status: "Error",
-          message: "Unable to fetch updated data from database",
+          status: 'Error',
+          message: 'Unable to fetch updated data from database',
         });
       }
 
       const data = result[0];
       return res.status(200).json({
-        status: "Success",
-        message: "Success",
+        status: 'Success',
+        message: 'Success',
         data: {
           id: data.todo_id,
           activity_group_id: data.activity_group_id,
@@ -417,28 +417,28 @@ exports.updateTodoItem = (req, res) => {
 exports.deleteTodoItem = (req, res) => {
   const todoId = req.params.todo_id;
 
-  const q = "DELETE FROM todos WHERE todo_id = ?";
+  const q = 'DELETE FROM todos WHERE todo_id = ?';
   const params = [todoId];
 
   db.query(q, params, (error, result) => {
     if (error) {
       console.error(error);
       return res.status(500).json({
-        status: "Error",
-        message: "Internal Server Error",
+        status: 'Error',
+        message: 'Internal Server Error',
       });
     }
 
     if (result.affectedRows === 0) {
       return res.status(404).json({
-        status: "Not Found",
+        status: 'Not Found',
         message: `Todo with ID ${todoId} Not Found`,
       });
     }
 
     return res.status(200).json({
-      status: "Success",
-      message: "Success",
+      status: 'Success',
+      message: 'Success',
       data: {},
     });
   });

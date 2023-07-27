@@ -1,5 +1,5 @@
-const mysql = require("mysql");
-require("dotenv").config();
+const mysql = require('mysql');
+require('dotenv').config();
 
 const db = mysql.createConnection({
   host: process.env.MYSQL_HOST,
@@ -11,9 +11,9 @@ const db = mysql.createConnection({
 
 db.connect((error) => {
   if (error) throw error;
-  console.log("DB Connected");
+  console.log('DB Connected');
 
-  migration(() => console.log("Migration running..."));
+  migration(() => console.log('Migration running...'));
 });
 
 const migration = () => {
