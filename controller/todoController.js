@@ -102,6 +102,7 @@ exports.createNew = async (req, res, next) => {
 };
 
 //note  update activities
+// need to be improved
 exports.update = async (req, res, next) => {
   try {
     const { title, email } = req.body;
@@ -145,7 +146,8 @@ exports.update = async (req, res, next) => {
       });
     }
 
-    const getUpdatedDataQuery = `SELECT * FROM activities WHERE activity_id = ?`;
+    const getUpdatedDataQuery =
+      'SELECT activity_id, title, email, created_at, updated_at FROM activities WHERE activity_id = ?';
     const updatedResult = await queryAsync(getUpdatedDataQuery, [
       req.params.activity_id,
     ]);
@@ -170,13 +172,14 @@ exports.update = async (req, res, next) => {
 //note Delete activities
 exports.deleteData = async (req, res, next) => {
   try {
+    const activityId = req.params.activity_id;
     const q = `DELETE FROM activities WHERE activity_id = ?`;
-    const result = await queryAsync(q, [req.params.activity_id]);
+    const result = await queryAsync(q, [activityId]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({
         status: 'Not Found',
-        message: `Activity with ID ${req.params.activity_id} Not Found`,
+        message: `Activity with ID ${activityId} Not Found`,
       });
     }
 
@@ -194,63 +197,50 @@ exports.deleteData = async (req, res, next) => {
 exports.getAllTodoItems = async (req, res, next) => {
   try {
     const { activity_group_id } = req.query;
-    let q = `SELECT * FROM todos`;
+    const q = `
+      SELECT 
+        todo_id, 
+        activity_group_id, 
+        title, 
+        is_active, 
+        priority, 
+        created_at, 
+        updated_at 
+      FROM todos 
+      WHERE activity_group_id = ?`;
 
-    // If activity_group_id query param is present and not empty
+    let result;
     if (activity_group_id && activity_group_id.trim()) {
-      q += ` WHERE activity_group_id = ?`;
-      const result = await queryAsync(q, [activity_group_id]);
-
-      if (!result.length) {
-        return res.status(200).json({
-          status: 'Success',
-          message: 'No data found',
-          data: [],
-        });
-      }
-
-      const data = result.map((item) => ({
-        id: item.todo_id,
-        activity_group_id: item.activity_group_id,
-        title: item.title,
-        is_active: Boolean(item.is_active),
-        priority: item.priority,
-        createdAt: item.created_at,
-        updatedAt: item.updated_at,
-      }));
-
-      return res.status(200).json({
-        status: 'Success',
-        message: 'Success',
-        data,
-      });
+      result = await queryAsync(q, [activity_group_id]);
     } else {
-      // If activity_group_id query param is missing or empty
-      const result = await queryAsync(q);
+      result = await queryAsync(
+        'SELECT todo_id, activity_group_id, title, is_active, priority, created_at, updated_at FROM todos'
+      );
+    }
 
-      if (!result.length) {
-        return res.status(404).json({
-          status: 'Error',
-          message: 'Requested data not found',
-        });
-      }
-
-      const data = result.map((item) => ({
-        id: item.todo_id,
-        activity_group_id: item.activity_group_id,
-        title: item.title,
-        is_active: Boolean(item.is_active),
-        priority: item.priority,
-        createdAt: item.created_at,
-        updatedAt: item.updated_at,
-      }));
-
+    if (!result.length) {
       return res.status(200).json({
         status: 'Success',
-        message: 'Success',
-        data,
+        message: 'No data found',
+        data: [],
       });
     }
+
+    const data = result.map((item) => ({
+      id: item.todo_id,
+      activity_group_id: item.activity_group_id,
+      title: item.title,
+      is_active: Boolean(item.is_active),
+      priority: item.priority,
+      createdAt: item.created_at,
+      updatedAt: item.updated_at,
+    }));
+
+    return res.status(200).json({
+      status: 'Success',
+      message: 'Success',
+      data,
+    });
   } catch (error) {
     next(error);
   }
@@ -259,7 +249,18 @@ exports.getAllTodoItems = async (req, res, next) => {
 // note get One todo Items
 exports.getOneTodoItem = async (req, res, next) => {
   try {
-    const q = `SELECT todo_id, activity_group_id, title, priority, is_active, created_at FROM todos WHERE todo_id = ?`;
+    const q = `
+      SELECT 
+        todo_id, 
+        activity_group_id, 
+        title, 
+        priority, 
+        is_active, 
+        created_at, 
+        updated_at 
+      FROM todos 
+      WHERE todo_id = ?`;
+
     const result = await queryAsync(q, [req.params.todo_id]);
 
     if (result.length === 0) {
@@ -343,76 +344,95 @@ exports.createNewTodoItem = (req, res) => {
 };
 
 // note update todos item
-exports.updateTodoItem = (req, res) => {
-  const { activity_group_id, title, is_active, priority } = req.body;
-  let sets = [];
-  if (activity_group_id !== undefined)
-    sets.push(`activity_group_id = ${db.escape(activity_group_id)}`);
-  if (title) sets.push(`title = ${db.escape(title)}`);
-  if (is_active !== undefined) sets.push(`is_active = ${is_active}`);
-  if (priority) sets.push(`priority = ${db.escape(priority)}`);
-  let setClause = sets.join(', ');
-  let q = `UPDATE todos SET ${setClause} WHERE todo_id=${req.params.todo_id};`;
-  db.query(q, (error, result) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({
-        status: 'Error',
-        message: 'Unable to update todo item',
+// need to be improved
+exports.updateTodoItem = async (req, res) => {
+  try {
+    const { activity_group_id, title, is_active, priority } = req.body;
+
+    let sets = [];
+    let values = [];
+
+    if (activity_group_id !== undefined) {
+      sets.push('activity_group_id = ?');
+      values.push(activity_group_id);
+    }
+    if (title) {
+      sets.push('title = ?');
+      values.push(title);
+    }
+    if (is_active !== undefined) {
+      sets.push('is_active = ?');
+      values.push(is_active);
+    }
+    if (priority) {
+      sets.push('priority = ?');
+      values.push(priority);
+    }
+
+    if (sets.length === 0) {
+      return res.status(400).json({
+        status: 'Bad Request',
+        message: 'No valid fields to update',
       });
     }
 
-    if (result.affectedRows === 0) {
+    values.push(req.params.todo_id);
+
+    const setClause = sets.join(', ');
+    const q = `UPDATE todos SET ${setClause} WHERE todo_id = ?`;
+    await queryAsync(q, values);
+
+    const getUpdatedTodoQuery = `
+      SELECT 
+        todo_id, 
+        activity_group_id, 
+        title, 
+        priority, 
+        is_active, 
+        created_at,
+        updated_at 
+      FROM todos 
+      WHERE todo_id = ?`;
+
+    const result = await queryAsync(getUpdatedTodoQuery, [req.params.todo_id]);
+
+    if (result.length === 0) {
       return res.status(404).json({
         status: 'Not Found',
         message: `Todo with ID ${req.params.todo_id} Not Found`,
       });
     }
 
-    // let getUpdatedTodoQuery = `SELECT * FROM todos WHERE todo_id=${req.params.todo_id}`;
-    let getUpdatedTodoQuery = `SELECT todo_id, activity_group_id, title, priority, is_active, created_at FROM todos WHERE todo_id = ${req.params.todo_id} `;
-    db.query(getUpdatedTodoQuery, (error, result) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).json({
-          status: 'Error',
-          message: 'Unable to fetch updated data from database',
-        });
-      }
-
-      const data = result[0];
-      return res.status(200).json({
-        status: 'Success',
-        message: 'Success',
-        data: {
-          id: data.todo_id,
-          activity_group_id: data.activity_group_id,
-          title: data.title,
-          is_active: data.is_active,
-          priority: data.priority,
-          createdAt: data.created_at,
-          updatedAt: data.updated_at,
-        },
-      });
+    const data = result[0];
+    return res.status(200).json({
+      status: 'Success',
+      message: 'Success',
+      data: {
+        id: data.todo_id,
+        activity_group_id: data.activity_group_id,
+        title: data.title,
+        is_active: Boolean(data.is_active),
+        priority: data.priority,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+      },
     });
-  });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: 'Error',
+      message: 'Unable to update todo item',
+    });
+  }
 };
 
 // note delete todos item
-exports.deleteTodoItem = (req, res) => {
-  const todoId = req.params.todo_id;
+exports.deleteTodoItem = async (req, res) => {
+  try {
+    const todoId = req.params.todo_id;
 
-  const q = 'DELETE FROM todos WHERE todo_id = ?';
-  const params = [todoId];
-
-  db.query(q, params, (error, result) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({
-        status: 'Error',
-        message: 'Internal Server Error',
-      });
-    }
+    const q = 'DELETE FROM todos WHERE todo_id = ?';
+    const result = await queryAsync(q, [todoId]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({
@@ -426,5 +446,11 @@ exports.deleteTodoItem = (req, res) => {
       message: 'Success',
       data: {},
     });
-  });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: 'Error',
+      message: 'Internal Server Error',
+    });
+  }
 };

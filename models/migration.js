@@ -1,7 +1,7 @@
 const db = require('./db');
 
 const migration = () => {
-  // Create 'activities' table
+  // Create 'activities' table with index on 'title' column
   db.query(
     `
     CREATE TABLE IF NOT EXISTS activities (
@@ -10,7 +10,8 @@ const migration = () => {
       email VARCHAR(255) NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      PRIMARY KEY (activity_id)
+      PRIMARY KEY (activity_id),  
+      INDEX title_index (title) -- Add index on 'title' column
     )
     `,
     (error) => {
@@ -19,7 +20,7 @@ const migration = () => {
     }
   );
 
-  // Create 'todos' table
+  // Create 'todos' table with indexes on 'activity_group_id', 'title', and 'priority' columns
   db.query(
     `
     CREATE TABLE IF NOT EXISTS todos (
@@ -31,7 +32,10 @@ const migration = () => {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       PRIMARY KEY (todo_id),
-      FOREIGN KEY (activity_group_id) REFERENCES activities(activity_id) ON DELETE CASCADE
+      FOREIGN KEY (activity_group_id) REFERENCES activities(activity_id) ON DELETE CASCADE,
+      INDEX activity_group_index (activity_group_id), -- Add index on 'activity_group_id' column
+      INDEX title_index (title), -- Add index on 'title' column
+      INDEX priority_index (priority) -- Add index on 'priority' column
     )
     `,
     (error) => {
