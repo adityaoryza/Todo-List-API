@@ -1,6 +1,12 @@
 const db = require('../models/db');
 const { queryAsync } = require('../models/dbUtils');
 
+exports.welcome = async (req, res, next) => {
+  return res.json({
+    message: 'Welcome to this API',
+  });
+};
+
 // note get all activities
 exports.getAll = async (req, res, next) => {
   try {

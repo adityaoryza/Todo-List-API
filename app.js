@@ -21,7 +21,7 @@ app.use(
 );
 app.use(cors());
 app.use(errorHandler);
-app.use('', todos);
+app.use('/api', todos);
 
 const port = process.env.PORT || 3030;
 const server = app.listen(port, () => {

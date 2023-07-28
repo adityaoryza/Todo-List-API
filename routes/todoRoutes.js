@@ -12,6 +12,7 @@ const {
   createNewTodoItem,
   updateTodoItem,
   deleteTodoItem,
+  welcome,
 } = require('../controller/todoController');
 
 const cacheMiddleware = (duration) => {
@@ -30,6 +31,8 @@ const cacheMiddleware = (duration) => {
     }
   };
 };
+
+router.get('/', welcome);
 
 // note activity-groups
 router.get('/activity-groups', cacheMiddleware(3 * 60), getAll);
