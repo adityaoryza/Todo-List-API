@@ -3,11 +3,12 @@ const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { errorHandler } = require('./middleware/errorMiddleware'); // Import the error handler middleware
 require('dotenv').config();
-
-// Import routes
+const { errorHandler } = require('./middleware/errorMiddleware');
 const todos = require('./routes/todoRoutes');
+const migration = require('./models/migration');
+
+migration();
 
 // Define middleware
 app.use(morgan('dev'));
@@ -19,14 +20,9 @@ app.use(
   })
 );
 app.use(cors());
-
-// Routes middleware
+app.use(errorHandler);
 app.use('', todos);
 
-// Error handling middleware
-app.use(errorHandler); // Use the error handling middleware
-
-// Define port
 const port = process.env.PORT || 3030;
 const server = app.listen(port, () => {
   console.log(`listening on http://localhost:${port}`);

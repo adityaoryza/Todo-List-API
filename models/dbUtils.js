@@ -1,5 +1,4 @@
-// dbUtils.js
-const db = require('./db'); // Replace with your database connection module
+const db = require('./db');
 
 exports.queryAsync = (query, values) => {
   return new Promise((resolve, reject) => {

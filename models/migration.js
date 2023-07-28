@@ -1,6 +1,5 @@
 const db = require('./db');
 
-// Migration function for creating tables
 const migration = () => {
   // Create 'activities' table
   db.query(
@@ -43,5 +42,3 @@ const migration = () => {
 };
 
 module.exports = migration;
-
-// currently not using migration

@@ -1,8 +1,7 @@
 const db = require('../models/db');
 const { queryAsync } = require('../models/dbUtils');
-const { errorHandler } = require('../middleware/errorMiddleware');
 
-// // note get all activities
+// note get all activities
 exports.getAll = async (req, res, next) => {
   try {
     const q = 'SELECT activity_id, title, email, created_at FROM activities';
@@ -22,7 +21,6 @@ exports.getAll = async (req, res, next) => {
       data,
     });
   } catch (error) {
-    // Pass the error to the error handling middleware
     next(error);
   }
 };
@@ -54,7 +52,6 @@ exports.getOne = async (req, res, next) => {
       },
     });
   } catch (error) {
-    // Pass the error to the error handling middleware
     next(error);
   }
 };
@@ -94,7 +91,6 @@ exports.createNew = async (req, res, next) => {
       data,
     });
   } catch (error) {
-    // Pass the error to the error handling middleware
     next(error);
   }
 };
@@ -161,7 +157,6 @@ exports.update = async (req, res, next) => {
       },
     });
   } catch (error) {
-    // Pass the error to the error handling middleware
     next(error);
   }
 };
@@ -185,7 +180,6 @@ exports.deleteData = async (req, res, next) => {
       data: {},
     });
   } catch (error) {
-    // Pass the error to the error handling middleware
     next(error);
   }
 };
@@ -252,7 +246,6 @@ exports.getAllTodoItems = async (req, res, next) => {
       });
     }
   } catch (error) {
-    // Pass the error to the error handling middleware
     next(error);
   }
 };
@@ -286,7 +279,6 @@ exports.getOneTodoItem = async (req, res, next) => {
       },
     });
   } catch (error) {
-    // Pass the error to the error handling middleware
     next(error);
   }
 };
