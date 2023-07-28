@@ -1,8 +1,31 @@
 {
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/api"
+      "src": "app.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/activity-groups",
+      "dest": "/app.js"
+    },
+    {
+      "src": "/activity-groups/:activity_id",
+      "dest": "/app.js"
+    },
+    {
+      "src": "/todo-items",
+      "dest": "/app.js"
+    },
+    {
+      "src": "/todo-items/:todo_id",
+      "dest": "/app.js"
+    },
+    {
+      "src": "/todo-items/activity-group/:activity_group_id",
+      "dest": "/app.js"
     }
   ]
 }
