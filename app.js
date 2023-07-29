@@ -10,7 +10,6 @@ const migration = require('./models/migration');
 
 migration();
 
-// Define middleware
 app.use(morgan('dev'));
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(

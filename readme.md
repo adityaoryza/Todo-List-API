@@ -23,94 +23,166 @@ Before using the TODO-LIST-API, you need to have the following installed on your
         npm start
 
 The server should now be running on http://localhost:3030.
+Sure! I'll format the documentation in Markdown, which is commonly used for GitHub documentation:
 
-# Here's the API documentation:
+## Todo List API Documentation
 
-    Get All Activity Groups:
-        URL: GET https://todo-list-api-eta.vercel.app/activity-groups
+### Base URL
 
-    Get One Activity Group:
-        URL: GET https://todo-list-api-eta.vercel.app/activity-groups/1
-        Replace 1 with the ID of the specific activity group you want to retrieve.
+```
+https://todo-list-api-eta.vercel.app
+```
 
-    Create New Activity Group:
-        URL: POST https://todo-list-api-eta.vercel.app/activity-groups
-        Body (raw JSON):
+### Activity Groups Endpoints
 
-        json
+#### Get All Activity Groups
 
-    {
-      "title": "test",
-      "email": "test@mail.com"
-    }
+```
+GET /activity-groups
+```
 
-Update Activity Group:
+Retrieve all activity groups.
 
-    URL: PATCH https://todo-list-api-eta.vercel.app/activity-groups/2
-    Body (raw JSON):
+#### Get One Activity Group
 
-    json
+```
+GET /activity-groups/:activity_id
+```
 
-    {
-      "title": "testing"
-    }
+Retrieve a specific activity group.
 
-    Replace 2 with the ID of the specific activity group you want to update.
+Parameters:
 
-Delete Activity Group:
+- `activity_id` (required): The ID of the activity group to retrieve.
 
-    URL: DELETE https://todo-list-api-eta.vercel.app/activity-groups/2
+#### Create New Activity Group
 
-Get All Todo Items for an Activity Group:
+```
+POST /activity-groups
+```
 
-    URL: GET https://todo-list-api-eta.vercel.app/todo-items?activity_group_id=1
-    Replace 1 with the ID of the activity group for which you want to retrieve todo items.
+Create a new activity group.
 
-Get One Todo Item:
+Request Body (JSON):
 
-    URL: GET https://todo-list-api-eta.vercel.app/todo-items/2
-    Replace 2 with the ID of the specific todo item you want to retrieve.
+```json
+{
+  "title": "test",
+  "email": "test@mail.com"
+}
+```
 
-Create New Todo Item:
+#### Update Activity Group
 
-    URL: POST https://todo-list-api-eta.vercel.app/todo-items
-    Body (raw JSON):
+```
+PATCH /activity-groups/:activity_id
+```
 
-    json
+Update an existing activity group.
 
-    {
-      "title": "ok",
-      "activity_group_id": 3,
-      "is_active": true
-    }
+Parameters:
 
-    The activity_group_id specifies the ID of the activity group to which the todo item belongs.
+- `activity_id` (required): The ID of the activity group to update.
 
-Update Todo Item:
+Request Body (JSON):
 
-    URL: PATCH https://todo-list-api-eta.vercel.app/todo-items/21
-    Body (raw JSON):
-
-    json
-
-    {
-      "title": "testing",
-      "priority": "very-high",
-      "is_active": true,
-      "status": "ok"
-    }
-
-    Replace 21 with the ID of the specific todo item you want to update.
-
-Delete Todo Item:
-
-    URL: DELETE https://todo-list-api-eta.vercel.app/todo-items/1
-    Body (raw JSON):
-
-    json
-
+```json
 {
   "title": "testing"
 }
+```
 
-Replace 1 with the ID of the specific todo item you want to delete.
+#### Delete Activity Group
+
+```
+DELETE /activity-groups/:activity_id
+```
+
+Delete an existing activity group.
+
+Parameters:
+
+- `activity_id` (required): The ID of the activity group to delete.
+
+### Todo Items Endpoints
+
+#### Get All Todo Items for an Activity Group
+
+```
+GET /todo-items?activity_group_id=:activity_group_id
+```
+
+Retrieve all todo items for a specific activity group.
+
+Parameters:
+
+- `activity_group_id` (required): The ID of the activity group for which to retrieve todo items.
+
+#### Get One Todo Item
+
+```
+GET /todo-items/:todo_id
+```
+
+Retrieve a specific todo item.
+
+Parameters:
+
+- `todo_id` (required): The ID of the todo item to retrieve.
+
+#### Create New Todo Item
+
+```
+POST /todo-items
+```
+
+Create a new todo item.
+
+Request Body (JSON):
+
+```json
+{
+  "title": "ok",
+  "activity_group_id": 3,
+  "is_active": true
+}
+```
+
+#### Update Todo Item
+
+```
+PATCH /todo-items/:todo_id
+```
+
+Update an existing todo item.
+
+Parameters:
+
+- `todo_id` (required): The ID of the todo item to update.
+
+Request Body (JSON):
+
+```json
+{
+  "title": "testing",
+  "priority": "very-high",
+  "is_active": true,
+  "status": "ok"
+}
+```
+
+#### Delete Todo Item
+
+```
+DELETE /todo-items/:todo_id
+```
+
+Delete an existing todo item.
+
+Parameters:
+
+- `todo_id` (required): The ID of the todo item to delete.
+
+---
+
+Please use the provided API endpoints with the base URL `https://todo-list-api-eta.vercel.app` to interact with the Todo List API. If you have any more questions or need further assistance, feel free to ask!
