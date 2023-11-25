@@ -3,6 +3,7 @@ const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const helmet = require('helmet');
 require('dotenv').config();
 const { errorHandler } = require('./middleware/errorMiddleware');
 const todos = require('./routes/todoRoutes');
@@ -18,9 +19,22 @@ app.use(
     extended: true,
   })
 );
+
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "https://www.google.com"],
+    styleSrc: ["'self'"],
+    imgSrc: ["'self'"],
+    fontSrc: ["'self'"],
+    frameSrc: ["'self'"],
+  },
+}));
+
 app.use(cors());
 app.use(errorHandler);
 app.use('', todos);
+
 
 const port = process.env.PORT || 3030;
 const server = app.listen(port, () => {
