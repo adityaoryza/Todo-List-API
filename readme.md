@@ -1,26 +1,34 @@
-## TODO-LIST-API Specification
-
-# Overview
-
-TODO-LIST-API is a simple REST API built using Node.js and Express.js that allows users to manage their to-do list.
-Requirements
+# TODO-LIST-API Specification
 
 Before using the TODO-LIST-API, you need to have the following installed on your computer:
 
-    Node.js
-    npm
-# Postman Documentation
-      https://documenter.getpostman.com/view/24306967/2s9YeD8ssV
-# Installation
+- Node.js
+- npm
 
-    Clone the repository:
-      git clone https://github.com/adityaoryza/TODO-LIST-API.git
-    Install the dependencies:
-      cd TODO-LIST-API
+## Postman Documentation
 
-      npm install
-    Start the server:
-      npm start
+[Postman Documentation](https://documenter.getpostman.com/view/24306967/2s9YeD8ssV)
+
+## Installation
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/adityaoryza/TODO-LIST-API.git
+    ```
+
+2. Install the dependencies:
+
+    ```bash
+    cd TODO-LIST-API
+    npm install
+    ```
+
+3. Start the server:
+
+    ```bash
+    npm start
+    ```
 
 
 ## Todo List API Documentation
