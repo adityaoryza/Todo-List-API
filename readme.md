@@ -10,26 +10,17 @@ Before using the TODO-LIST-API, you need to have the following installed on your
     Node.js
     npm
 # Postman Documentation
-    ```
       https://documenter.getpostman.com/view/24306967/2s9YeD8ssV
-    ```
 # Installation
 
     Clone the repository:
-    ```
       git clone https://github.com/adityaoryza/TODO-LIST-API.git
-    ```
     Install the dependencies:
-    ```
       cd TODO-LIST-API
-    ```
-    ```
+
       npm install
-    ```
     Start the server:
-  ```
       npm start
-  ```        
 
 
 ## Todo List API Documentation
