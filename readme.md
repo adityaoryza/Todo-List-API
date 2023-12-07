@@ -1,4 +1,4 @@
-## TODO-LIST-API
+## TODO-LIST-API Specification
 
 # Overview
 
@@ -10,29 +10,35 @@ Before using the TODO-LIST-API, you need to have the following installed on your
     Node.js
     npm
 # Postman Documentation
-    https://documenter.getpostman.com/view/24306967/2s9YeD8ssV
+    ```
+      https://documenter.getpostman.com/view/24306967/2s9YeD8ssV
+    ```
 # Installation
 
     Clone the repository:
-        git clone https://github.com/adityaoryza/TODO-LIST-API.git
-
+    ```
+      git clone https://github.com/adityaoryza/TODO-LIST-API.git
+    ```
     Install the dependencies:
-        cd TODO-LIST-API
-        npm install
-
+    ```
+      cd TODO-LIST-API
+    ```
+    ```
+      npm install
+    ```
     Start the server:
-        npm start
+  ```
+      npm start
+  ```        
 
-The server should now be running on http://localhost:3030.
-Sure! I'll format the documentation in Markdown, which is commonly used for GitHub documentation:
 
 ## Todo List API Documentation
 
 ### Base URL
 
-```
-https://todo-list-api-eta.vercel.app
-```
+  ```
+  https://api.adityaoryza.my.id/
+  ```
 
 ### Activity Groups Endpoints
 
@@ -186,4 +192,4 @@ Parameters:
 
 ---
 
-Please use the provided API endpoints with the base URL `https://todo-list-api-eta.vercel.app` to interact with the Todo List API. If you have any more questions or need further assistance, feel free to ask!
+Please use the provided API endpoints with the base URL `https://api.adityaoryza.my.id/` to interact with the Todo List API. If you have any more questions or need further assistance, feel free to ask!
