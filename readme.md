@@ -33,6 +33,8 @@ Before using the TODO-LIST-API, you need to have the following installed on your
 
 ## Todo List API Documentation
 
+![Table Relation](./readmeFile/todo-listAPI.png)
+
 ### Base URL
 
   ```
